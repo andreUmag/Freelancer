@@ -34,7 +34,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDto> getOrderById(@RequestParam Long id) {
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
         Optional<OrderDto> order = orderService.getOrderById(id);
         return order.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -44,11 +44,11 @@ public class OrderController {
     public ResponseEntity<OrderDto> updateOrder(@PathVariable Long id, @RequestBody OrderToSaveDto orderToSaveDto) {
         try {
             OrderDto updateOrder = orderService.updateOrder(id, orderToSaveDto);
-            return ResponseEntity.status(HttpStatus.OK).body(updateOrder);
-        }catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updateOrder);
+            }catch (RuntimeException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
         }
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<OrderDto> deleteOrder(@PathVariable Long id) {
