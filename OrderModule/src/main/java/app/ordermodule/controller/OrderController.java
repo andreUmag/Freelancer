@@ -6,6 +6,7 @@ import app.ordermodule.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,18 +23,21 @@ public class OrderController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> saveOrder(@RequestBody OrderToSaveDto orderToSaveDto) {
         OrderDto savedOrder = orderService.saveOrder(orderToSaveDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDto>> getAllOrders() {
         List<OrderDto> orders = orderService.getAllOrders();
         return ResponseEntity.status(HttpStatus.OK).body(orders);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
         Optional<OrderDto> order = orderService.getOrderById(id);
         return order.map(ResponseEntity::ok)
@@ -41,6 +45,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> updateOrder(@PathVariable Long id, @RequestBody OrderToSaveDto orderToSaveDto) {
         try {
             OrderDto updateOrder = orderService.updateOrder(id, orderToSaveDto);
@@ -51,6 +56,7 @@ public class OrderController {
         }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> deleteOrder(@PathVariable Long id) {
         try {
             orderService.deleteOrder(id);
