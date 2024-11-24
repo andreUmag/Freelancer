@@ -3,8 +3,10 @@ import app.ordermodule.client.ProductClient;
 import app.ordermodule.dto.OrderDto;
 import app.ordermodule.dto.OrderMapper;
 import app.ordermodule.dto.OrderToSaveDto;
+import app.ordermodule.dto.ProductDto;
 import app.ordermodule.model.OrderModel;
 import app.ordermodule.repository.OrderRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,14 +44,55 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getAllOrders() {
         List<OrderModel> orderModels = orderRepository.findAll();
-        return orderModels.stream().map(orderMapper::toDto).toList();
+        ObjectMapper objectMapper = new ObjectMapper(); // Para deserializar el producto
+
+        return orderModels.stream().map(orderModel -> {
+            ResponseEntity<?> productResponse = productClient.getProductById(orderModel.getProduct_id());
+            ProductDto product = null;
+            if (productResponse.getStatusCode().is2xxSuccessful()) {
+                product = objectMapper.convertValue(productResponse.getBody(), ProductDto.class);
+            }
+            OrderDto orderDto = orderMapper.toDto(orderModel);
+            return new OrderDto(orderDto.id(), orderDto.user_email(), orderDto.product_id(), product, orderDto.state(), orderDto.quantity());
+        }).toList();
     }
 
     @Override
     public Optional<OrderDto> getOrderById(Long id) {
         Optional<OrderModel> orderModel = orderRepository.findById(id);
-        return orderModel.map(orderMapper::toDto);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return orderModel.map(order -> {
+            ResponseEntity<?> productResponse = productClient.getProductById(order.getProduct_id());
+            ProductDto product = null;
+            if (productResponse.getStatusCode().is2xxSuccessful()) {
+                product = objectMapper.convertValue(productResponse.getBody(), ProductDto.class);
+            }
+            OrderDto orderDto = orderMapper.toDto(order);
+            return new OrderDto(orderDto.id(), orderDto.user_email(), orderDto.product_id(), product, orderDto.state(), orderDto.quantity());
+        });
     }
+
+    @Override
+    public List<OrderDto> getOrdersByProductId(Long productId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<OrderModel> orderModels = orderRepository.findAll().stream()
+                .filter(order -> order.getProduct_id().equals(productId))
+                .toList();
+
+        return orderModels.stream().map(orderModel -> {
+            ResponseEntity<?> productResponse = productClient.getProductById(orderModel.getProduct_id());
+            ProductDto product = null;
+            if (productResponse.getStatusCode().is2xxSuccessful()) {
+                product = objectMapper.convertValue(productResponse.getBody(), ProductDto.class);
+            }
+
+            OrderDto orderDto = orderMapper.toDto(orderModel);
+            return new OrderDto(orderDto.id(), orderDto.user_email(), orderDto.product_id(), product, orderDto.state(), orderDto.quantity());
+        }).toList();
+    }
+
 
     @Override
     public OrderDto updateOrder(Long id, OrderToSaveDto orderToSaveDto) {

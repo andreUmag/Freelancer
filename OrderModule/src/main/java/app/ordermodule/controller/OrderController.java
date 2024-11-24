@@ -44,6 +44,13 @@ public class OrderController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @GetMapping("/product/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDto>> getOrdersByProductId(@PathVariable Long productId) {
+        List<OrderDto> orders = orderService.getOrdersByProductId(productId);
+        return ResponseEntity.status(HttpStatus.OK).body(orders);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderDto> updateOrder(@PathVariable Long id, @RequestBody OrderToSaveDto orderToSaveDto) {

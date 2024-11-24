@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
+    List<OrderDto> getOrdersByProductId(Long productId);
     OrderDto saveOrder(OrderToSaveDto orderToSaveDto);
     List<OrderDto> getAllOrders();
     Optional<OrderDto> getOrderById(Long id);
