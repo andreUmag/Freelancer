@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException("Product with ID " + orderToSaveDto.product_id() + " does not exist.");
             }
 
-            orderModel.setUser_id(orderToSaveDto.user_id());
+            orderModel.setUser_email(orderToSaveDto.user_email());
             orderModel.setProduct_id(orderToSaveDto.product_id());
             orderModel.setQuantity(orderToSaveDto.quantity());
             orderModel.setState(orderToSaveDto.state());

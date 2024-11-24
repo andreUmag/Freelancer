@@ -1,4 +1,4 @@
 package app.ordermodule.dto;
 
-public record OrderToSaveDto(Long id, Long user_id, Long product_id, String state, Integer quantity) {
+public record OrderToSaveDto(Long id, String user_email, Long product_id, String state, Integer quantity) {
 }

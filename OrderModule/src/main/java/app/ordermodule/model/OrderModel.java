@@ -14,7 +14,7 @@ public class OrderModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long user_id;
+    private String user_email;
     private Long product_id;
     private String state;
     private Integer quantity;
