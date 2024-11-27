@@ -24,9 +24,13 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<OrderDto> saveOrder(@RequestBody OrderToSaveDto orderToSaveDto) {
-        OrderDto savedOrder = orderService.saveOrder(orderToSaveDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
+    public ResponseEntity<?> saveOrder(@RequestBody OrderToSaveDto orderToSaveDto) {
+        try {
+            OrderDto savedOrder = orderService.saveOrder(orderToSaveDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping

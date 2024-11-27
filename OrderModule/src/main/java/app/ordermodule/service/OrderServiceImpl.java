@@ -36,6 +36,14 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Product with ID " + orderToSaveDto.product_id() + " does not exist.");
         }
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProductDto product = objectMapper.convertValue(productResponse.getBody(), ProductDto.class);
+
+        if (product.stock() < orderToSaveDto.quantity()) {
+            throw new RuntimeException("Stock insufficient para el product: " + orderToSaveDto.product_id() +
+                    ". Stock disposable: " + product.stock() + ", requested: " + orderToSaveDto.quantity());
+        }
+
         OrderModel orderModel = orderMapper.saveDtoToEntity(orderToSaveDto);
         OrderModel orderModelSaved = orderRepository.save(orderModel);
         return orderMapper.toDto(orderModelSaved);
@@ -44,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getAllOrders() {
         List<OrderModel> orderModels = orderRepository.findAll();
-        ObjectMapper objectMapper = new ObjectMapper(); // Para deserializar el producto
+        ObjectMapper objectMapper = new ObjectMapper();
 
         return orderModels.stream().map(orderModel -> {
             ResponseEntity<?> productResponse = productClient.getProductById(orderModel.getProduct_id());
